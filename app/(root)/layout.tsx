@@ -7,7 +7,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
       <div className='root-container'>
         <div className='wrapper'>{children}</div>
-        <UserButton afterSignOutUrl='/' />
+        
       </div>
     </main>
   );
