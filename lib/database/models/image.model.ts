@@ -1,5 +1,7 @@
 import { Document, Schema, model, models } from 'mongoose';
 
+
+//easy to know our frontend that which fields needed for image models
 export interface IImage extends Document {
   title: string;
   transformationType: string;
