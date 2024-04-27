@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
 
 import { clerkClient } from '@clerk/nextjs/server';
-import { WebhookEvent } from '@clerk/nextjs/server';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { WebhookEvent } from '@clerk/nextjs/server';
 import { Webhook } from 'svix';
 
 import { createUser, deleteUser, updateUser } from '@/lib/actions/user.action';
 
 export async function POST(req: Request) {
-  // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
+  // Clerk Dashboard -> Webhooks -> choose the webhook
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
@@ -67,11 +67,12 @@ export async function POST(req: Request) {
       clerkId: id!,
       email: email_addresses[0].email_address!,
       username: username!,
-      firstName: first_name || '',
-      lastName: last_name || '',
+      firstName: first_name as string,
+      lastName: last_name as string,
       photo: image_url!,
     };
 
+    //this is a webhook we will not use it , clerk call it automatically that;s why we are not using tyr catch because clerk will manage it
     const newUser = await createUser(user);
 
     // Set public metadata
@@ -91,12 +92,13 @@ export async function POST(req: Request) {
     const { id, image_url, first_name, last_name, username } = evt.data;
 
     const user = {
-      firstName: first_name!,
-      lastName: last_name!,
+      firstName: first_name as string,
+      lastName: last_name as string,
       username: username!,
       photo: image_url!,
     };
 
+    //as clerk take care of upadating and managing the user that's why we are trying to find the user from database on the basis of clerk id
     const updatedUser = await updateUser(id, user);
 
     return NextResponse.json({ message: 'OK', user: updatedUser });

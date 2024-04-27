@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import User from "../database/models/user.model";
 import { connectToDB } from "../database/db";
 import { handleError } from "../utils";
-//as next is a server less architechture so we have to connect db everytime whaen performing any operation
+
+//as next is a server-less architechture so we have to connect db everytime whaen performing any operation in database
 
 // CREATE
 export async function createUser(user: CreateUserParams) {
@@ -45,6 +46,7 @@ export async function updateUser(clerkId: string, user: UpdateUserParams) {
       new: true,
     });
 
+    //we can't retirn any response beacuse this is server actions
     if (!updatedUser) throw new Error("User update failed");
     
     return JSON.parse(JSON.stringify(updatedUser));
