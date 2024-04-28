@@ -10,16 +10,19 @@ const page = async ({ params }: { params: { type: string } }) => {
   const { userId } = auth();
   const user = await getUserById(userId as string);
   const type: string = params.type;
-  const transformation = transformationTypes[type];
+  const transformation = transformationTypes[type as TransformationTypeKey];
   return (
     <>
       <Header title={transformation.title} subtitle={transformation.subTitle} />
+      <section className='mt-10'>
       <TransformationForm
+      //as we are in add page so action is add
         action='Add'
         userId={user._id}
-        type={transformation as TransformationTypeKey}
+        type={transformation.type as TransformationTypeKey}
         creditBalance={user.creditBalance}
       />
+      </section>
     </>
   );
 };

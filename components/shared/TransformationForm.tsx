@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -13,10 +13,25 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { defaultValues } from '@/constants';
+import {
+  aspectRatioOptions,
+  defaultValues,
+  transformationTypes,
+} from '@/constants';
+import { CustomField } from './CustomField';
+import { AspectRatioKey } from '@/lib/utils';
 
-const formSchema = z.object({
+export const formSchema = z.object({
   title: z.string(),
   aspectRatio: z.string().optional(),
   color: z.string().optional(),
@@ -41,7 +56,20 @@ const formSchema = z.object({
 //   }
 // }
 
-const TransformationForm = ({ data = null, action }: TransformationFormProps) => {
+const TransformationForm = ({
+  data = null,
+  action,
+  type,
+  userId,
+  creditBalance,
+}: TransformationFormProps) => {
+  const transformation = transformationTypes[type];
+  const [iamge, setImage] = useState(data);
+  const [newTransformation, setNewTransformation] =
+    useState<Transformations | null>(null);
+    const[isSubmitting, setIsSubmitting] = useState(false);
+    const [isTransforming, setIsTransforming] = useState(false)
+    const [transformationConfig, setTransformationConfig] = useState(false)
   const initialsValue =
     data && action === 'Update'
       ? {
@@ -64,26 +92,121 @@ const TransformationForm = ({ data = null, action }: TransformationFormProps) =>
     // ✅ This will be type-safe and validated.
     console.log(values);
   }
+
+  const handleTransformation = ()=>{
+
+  }
+
+  const onSelectHandler = (
+    value: string,
+    onChangeField: (value: string) => void
+  ) => {};
+
+  const onChangeHandler = (
+    field: string,
+    value: string,
+    type: string,
+    onChangeField: (value: string) => void
+  ) => {};
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <FormField
+        <CustomField
           control={form.control}
-          name='username'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder='shadcn' {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
+          name='title'
+          formLabel='Image Title'
+          className='w-full'
+          render={({ field }) => <Input {...field} className='input-field' />}
         />
-        <Button type='submit'>Submit</Button>
+        {type === 'fill' && (
+          <CustomField
+            control={form.control}
+            name='aspectRatio'
+            formLabel='Aspect Ratio'
+            className='w-full'
+            render={({ field }) => {
+              return (
+                <Select
+                  onValueChange={(value: any) =>
+                    onSelectHandler(value, field.onChange)
+                  }
+                >
+                  <SelectTrigger className='w-[180px]'>
+                    <SelectValue placeholder='Select Size' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Select Size</SelectLabel>
+                      {Object.keys(aspectRatioOptions).map((key) => {
+                        return (
+                          <SelectItem key={key} value={key}>
+                            {aspectRatioOptions[key as AspectRatioKey].label}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              );
+            }}
+          />
+        )}
+        {(type === 'remove' || type === 'recolor') && (
+          <div className='promt-field'>
+            <CustomField
+              control={form.control}
+              name='prompt'
+              formLabel={
+                type === 'recolor' ? 'Object to recolor' : 'Object to Remove'
+              }
+              className='w-full'
+              render={({ field }) => (
+                <Input
+                  className='input-field'
+                  value={field.value}
+                  onChange={(e) =>
+                    onChangeHandler(
+                      'prompt',
+                      e.target.value,
+                      type,
+                      field.onChange
+                    )
+                  }
+                />
+              )}
+            />
+            {type === 'recolor' && (
+              <CustomField
+                name='color'
+                formLabel='Replacement Color'
+                control={form.control}
+                className='w-full'
+                render={({ field }) => (
+                  <Input
+                    className='input-field'
+                    value={field.value}
+                    onChange={(e) =>
+                      onChangeHandler(
+                        'color',
+                        e.target.value,
+                        'recolor',
+                        field.onChange
+                      )
+                    }
+                  />
+                )}
+              />
+            )}
+          </div>
+        )}
+        <div className='flex flex-col gap-4'>
+        <Button type='button' disabled={isTransforming || newTransformation === null} className='submit-button capitalize' onClick={handleTransformation}>
+          {isTransforming ? 'transforming..': 'Apply Transformation'}
+        </Button>
+        <Button type='submit' disabled={isSubmitting} className='submit-button capitalize'>
+          {isSubmitting? 'submitting...' : 'Submit'}
+        </Button>
+        </div>
       </form>
     </Form>
   );
