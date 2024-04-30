@@ -15,13 +15,13 @@ const page = async ({ params }: { params: { type: string } }) => {
     <>
       <Header title={transformation.title} subtitle={transformation.subTitle} />
       <section className='mt-10'>
-      <TransformationForm
-      //as we are in add page so action is add
-        action='Add'
-        userId={user._id}
-        type={transformation.type as TransformationTypeKey}
-        creditBalance={user.creditBalance}
-      />
+        <TransformationForm
+          //as we are in add page so action is add
+          action='Add'
+          userId={user._id}
+          type={transformation.type as TransformationTypeKey}
+          creditBalance={user.creditBalance}
+        />
       </section>
     </>
   );
